@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: hauschild_app
+    run: python_app
+    track: stable
+  name: app
+  namespace: default
+spec:
+  externalTrafficPolicy: Cluster
+  ports:
+  - nodePort: 32222
+    name: http
+    port: 5000
+    protocol: TCP
+    targetPort: 5000
+  - nodePort: 32111
+    name: prometheus
+    port: 32111
+    protocol: TCP
+    targetPort: 32111
+  selector:
+    app: app
+  sessionAffinity: None
+  type: NodePort

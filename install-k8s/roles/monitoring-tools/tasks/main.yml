@@ -1,0 +1,11 @@
+- name: Add repo Helm
+  command: helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+  register: prometheus_add_repo
+
+- name: helm update
+  command: helm repo update
+  register: prometheus_repo_update
+
+- name: Instalando o prometheus operator 
+  command: helm install my-prometheus prometheus-community/kube-prometheus-stack
+  register: install_prometheus

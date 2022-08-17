@@ -1,0 +1,6 @@
+- hosts: master
+  user: itbrasil
+  become: yes
+  roles:
+  - { role: deploy-app, tags: ["deploy_app_role"] }
+  

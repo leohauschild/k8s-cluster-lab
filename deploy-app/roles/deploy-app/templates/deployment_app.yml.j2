@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-v1
+spec:
+  replicas: {{ number_replicas }}
+  selector:
+    matchLabels:
+      app: app
+  template:
+    metadata:
+      labels:
+        app: app
+        version: {{ version }}
+      annotations:
+        prometheus.io/scrape: "{{ prometheus_scrape }}"
+        prometheus.io/port: "{{ prometheus_port }}"
+    spec:
+      containers:
+      - name: app
+        image: leohauschild/hello-world-hauschild-app:0.0.1.RELEASE
+        env:
+        - name: VERSION
+          value: {{ version }}
+        ports:
+        - containerPort: {{ app_port }}
+        - containerPort: {{ prometheus_port }}

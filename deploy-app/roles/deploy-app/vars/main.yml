@@ -1,0 +1,5 @@
+number_replicas: 10
+prometheus_scrape: "true"
+prometheus_port: 32111
+app_port: 5000
+version: 0.0.1

@@ -1,0 +1,45 @@
+- name: reset cluster caso exista
+  command:
+    kubeadm reset --force
+  register: reset_cluster
+
+- name: Inicializando o cluster k8s
+  command: 
+    kubeadm init
+  register: kubeadm_init
+
+- name: Copiando arquivos conforme solicitado na criação do cluster
+  shell: |
+    mkdir -p $HOME/.kube
+    sudo cp -f /etc/kubernetes/admin.conf $HOME/.kube/config
+    sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+- name: Configurando o pod network Weavenet
+  shell: kubectl apply -f {{ DEFAULT_URL_WEAVE }}
+  register: weavenet_result
+
+- name: Pegando o token para adicionar os workers no cluster
+  shell: kubeadm token list | cut -d ' ' -f1  | sed -n '2p'
+  register: k8s_token
+  changed_when: True
+
+- name: CA Hash
+  shell: openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'
+  register: k8s_master_ca_hash
+  changed_when: True
+
+- name: Pegando o token para adicionar os workers no cluster
+  shell: kubeadm token list | cut -d ' ' -f1  | sed -n '2p'
+  register: k8s_token
+  changed_when: True
+
+- name: CA Hash
+  shell: openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'
+  register: k8s_master_ca_hash
+  changed_when: True
+
+- name: Adicionando o token e o hash em um dummy host
+  add_host:
+    name: "K8S_TOKEN_HOLDER"
+    token: "{{ k8s_token.stdout }}"
+    hash: "{{ k8s_master_ca_hash.stdout }}"

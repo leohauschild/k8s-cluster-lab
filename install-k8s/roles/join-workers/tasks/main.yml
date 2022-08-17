@@ -1,0 +1,8 @@
+- name: reset cluster caso exista
+  command:
+      kubeadm reset --force
+  register: reset_cluster
+
+- name: Adicionando o worker ao cluster k8s
+  shell:
+      kubeadm join --token={{ hostvars['K8S_TOKEN_HOLDER']['token']}} --discovery-token-ca-cert-hash sha256:{{ hostvars['K8S_TOKEN_HOLDER']['hash']}} {{IP_MASTER}}:{{PORT}} 

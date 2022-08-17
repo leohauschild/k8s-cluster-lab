@@ -1,0 +1,30 @@
+- name: Criando o diretorio da app
+  file: path={{item}} state=directory
+  with_items:
+    - /opt/app
+    - /opt/app/logs
+    - /opt/app/conf
+  register: creating_dirs
+
+- name: Copiando o arquivo de deployment da app paara o master
+  template:
+    src: deployment_app.yml.j2
+    dest: /opt/app/deployment_app.yml
+    owner: root
+    group: root
+    mode: 0644
+  register: copy_template
+  
+- name: Copiando o arquivo de service da app para o host
+  copy: src={{ item.src }} dest={{ item.dest }}
+  with_items: 
+    - { src: 'service_app.yml', dest: '/opt/app/service_app.yml'}
+  register: copy_service
+
+- name: Criando o deployment da app
+  shell: kubectl apply -f /opt/app/deployment_app.yml
+  register: deploy_app
+
+- name: Criando o service da app
+  shell: kubectl apply -f /opt/app/service_app.yml
+  register: deploy_service

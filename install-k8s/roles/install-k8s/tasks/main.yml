@@ -1,0 +1,66 @@
+- name: Atualizando repositório inicial
+  shell: apt update
+  
+- name: Desabilita swap
+  shell: swapoff -a
+  
+- name: Desabilita swap no arquivo fstab
+  replace:
+    path: /etc/fstab
+    regexp: '(.*swap.*)'
+    replace: '#\1'
+
+- name: Instalando curl, transport https, repositório do kubernetes e key gpg
+  shell: |
+      apt install curl apt-transport-https -y
+      curl -fsSL  https://packages.cloud.google.com/apt/doc/apt-key.gpg|sudo gpg --batch --yes --dearmor -o /etc/apt/trusted.gpg.d/k8s.gpg
+      curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+      echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+- name: Atualizando repositório 
+  shell: apt update
+  
+- name: Instalando kubelet kubeadm kubectl
+  apt:
+    name: "{{PACKAGES}}"
+
+- name: apt-mark
+  shell: apt-mark hold kubelet kubeadm kubectl
+
+- name: Habilitando kernel modules
+  shell: | 
+      modprobe overlay
+      modprobe br_netfilter
+
+- name: Adicionando configurações no sysctl
+  shell: |    
+      sudo tee /etc/sysctl.d/kubernetes.conf<<EOF
+      net.bridge.bridge-nf-call-ip6tables = 1
+      net.bridge.bridge-nf-call-iptables = 1
+      net.ipv4.ip_forward = 1
+      EOF
+      
+- name: Altera configuração usr/lib/sysctl.d/50-default.conf
+  lineinfile: 
+    path: /usr/lib/sysctl.d/50-default.conf
+    regex: '-net.ipv4.conf.all.promote_secondaries'
+    line: 'net.ipv4.conf.all.promote_secondaries = 1'
+    state: present
+
+- name: sysctl 
+  shell: sysctl --system
+
+- name: Add repositorio containerd
+  shell: |
+      curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+      add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+
+- name: Instalando containerd
+  shell: |
+      apt update
+      apt install -y containerd.io
+
+- name: removendo arquivo /etc/containerd/config.toml e reiniciando serviço do containerd
+  shell: |
+      rm /etc/containerd/config.toml
+      systemctl restart containerd
