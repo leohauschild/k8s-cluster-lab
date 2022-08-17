@@ -1,44 +1,44 @@
 variable "vsphere_user" {
     type = string    
-    default = "leonardo.hauschild@itbrasil.net"  
+    default = "user"  
 }
 
 variable "vsphere_password" {
     type = string    
-    default = "lhgr@.93"
+    default = "password"
 }
 
 variable "vsphere_datacenter" {
     type = string
-    default = "IT Brasil Headquarters"
+    default = "dc"
 }
 
 variable "vsphere_datastore" {
     type = string
-    default = "FLASH-12TB-Hyb"
+    default = "ds"
 }
 
 variable "vsphere_compute_cluster" {
     type = string
-    default = "node01"
+    default = "cluster-name"
 }
 
 variable "vsphere_resource_pool" {
     type = string
-    default = "LAB"
+    default = "pool-name"
 }
 
 variable "vsphere_network" {
-    default = "VLAN 8 - Lab"  
+    default = "vlan"  
 }
 
 variable "vsphere_template" {
-    default = "k8s-ubuntu-20.04" 
+    default = "template-name" 
 }
 
 variable "vsphere_server" {
     type = string    
-    default = "192.168.1.90"
+    default = "vcenter-server"
 }
 
 variable "name_vm_workers" {

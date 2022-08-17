@@ -1,30 +1,30 @@
 - hosts: all
   become: yes
-  user: itbrasil
+  user: user
   roles:
   - { role: install-k8s, tags: ["install-k8s-role"] }
 
 - hosts: master
   become: yes
-  user: itbrasil
+  user: user
   roles:
   - { role: create-cluster, tags: ["create-cluster-role"] }
 
 - hosts: workers
   become: yes
-  user: itbrasil
+  user: user
   roles:
   - { role: join-workers, tags: ["join-workers-role"] }
 
 - hosts: master
   become: yes
-  user: itbrasil
+  user: user
   roles:
   - { role: install-helm, tags: ["install-helm-role"] }
 
 - hosts: master
   become: yes
-  user: itbrasil
+  user: user
   roles:
   - { role: monitoring-tools, tags: ["monitoring-tools-role"] }
 
